@@ -7,14 +7,14 @@ class LoanRequest(models.Model):
 		('O', 'Other'),
 	]
 
-	dni = models.CharField(max_length=16)
+	dni = models.PositiveIntegerField()
 	first_name = models.CharField(max_length=64)
 	last_name = models.CharField(max_length=64)
 	gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 	email = models.EmailField()
-	amount = models.DecimalField(max_digits=10, decimal_places=0)
+	amount = models.PositiveIntegerField()
 	approved = models.BooleanField()
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
-		return f"{self.name} ({self.dni})"
+		return f"{self.first_name} {self.last_name} ({self.dni})"

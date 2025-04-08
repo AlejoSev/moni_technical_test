@@ -18,7 +18,9 @@ class LoanRequestView(APIView):
 
 		if serializer.is_valid():
 			dni = serializer.validated_data['dni']
-			approved = self.check_external_api(dni)
+			loan_request_status = self.check_external_api(dni)
+
+			approved = True if loan_request_status == STATUS_APPROVED else False
 
 			loan = LoanRequest.objects.create(
 				approved=approved,
@@ -26,7 +28,7 @@ class LoanRequestView(APIView):
 			)
 
 			return Response({
-				'msg': f'Loan {approved}!'
+				'msg': f'Loan {loan_request_status}!'
 			}, status=status.HTTP_201_CREATED)
 		
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

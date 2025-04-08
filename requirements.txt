@@ -4,3 +4,5 @@ django-cors-headers
 requests
 psycopg2-binary
 python-decouple
+pytest
+pytest-django

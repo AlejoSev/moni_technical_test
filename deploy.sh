@@ -1,3 +1,9 @@
+#!/bin/bash
+
+echo "📦 Buildeando contenedores..."
 docker-compose down --volumes --remove-orphans
-docker-compose up --build
-docker-compose up --build
+
+echo "🚀 Levantando contenedores..."
+docker-compose up -d --build
+
+echo "✅ Deploy terminado."
