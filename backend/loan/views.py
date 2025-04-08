@@ -4,16 +4,21 @@ import os
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework import status
 
 from .models import LoanRequest
 from .serializers import LoanRequestSerializer
 from .const import STATUS_APPROVED
 from .const import STATUS_REJECTED
+from .const import LoanRequestStatus
 
 
 class LoanRequestView(APIView):
-	def post(self, request):
+	def post(self, request: Request) -> Response:
+		"""
+		Endpoint that creates the LoanRequest object.
+		"""
 		serializer = LoanRequestSerializer(data=request.data)
 
 		if serializer.is_valid():
@@ -33,7 +38,11 @@ class LoanRequestView(APIView):
 		
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	def check_external_api(self, dni):
+	def check_external_api(self, dni: int) -> LoanRequestStatus:
+		"""
+		Makes the POST request to the external API, using the requested DNI to check if the
+		loan is approved or rejected for that user.
+		"""
 		url = os.getenv("EXTERNAL_API_URL")
 
 		headers = {

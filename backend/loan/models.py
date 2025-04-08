@@ -7,12 +7,12 @@ class LoanRequest(models.Model):
 		('O', 'Other'),
 	]
 
-	dni = models.PositiveIntegerField()
-	first_name = models.CharField(max_length=64)
-	last_name = models.CharField(max_length=64)
-	gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-	email = models.EmailField()
-	amount = models.PositiveIntegerField()
+	dni = models.PositiveIntegerField(blank=False, null=False)
+	first_name = models.CharField(max_length=64, blank=False, null=False)
+	last_name = models.CharField(max_length=64, blank=False, null=False)
+	gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=False, null=False)
+	email = models.EmailField(blank=False, null=False)
+	amount = models.PositiveIntegerField(blank=False, null=False)
 	approved = models.BooleanField()
 	created_at = models.DateTimeField(auto_now_add=True)
 
