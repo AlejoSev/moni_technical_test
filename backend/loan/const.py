@@ -1,0 +1,2 @@
+STATUS_APPROVED='approved'
+STATUS_REJECTED='rejected'
