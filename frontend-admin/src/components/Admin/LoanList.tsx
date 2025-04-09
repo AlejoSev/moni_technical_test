@@ -16,8 +16,6 @@ export const LoanList = () => {
   useEffect(() => {
     const fetchLoans = async () => {
       const token = localStorage.getItem('authToken');
-
-      console.log(token);
       
       if (!token) {
         alert('No tienes sesión iniciada');

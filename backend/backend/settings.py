@@ -81,8 +81,10 @@ SESSION_COOKIE_SECURE = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5173",
-    "http://localhost:5173",
+    "http://127.0.0.1:50000",
+    "http://localhost:50000",
+    "http://127.0.0.1:50001",
+    "http://localhost:50001",
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -114,7 +116,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': 'db',  # El nombre del servicio en docker-compose
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

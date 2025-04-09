@@ -23,7 +23,7 @@ export const LoanForm = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		try {
-		  const response = await axios.post('/api/loans/', formData);
+		  const response = await axios.post('/api/loans', formData);
 		  const resultMessage = response.data.msg;
 		  navigate('/resultado', { state: { result: resultMessage } });
 		} catch (err) {
