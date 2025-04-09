@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "📦 Buildeando contenedores..."
-docker-compose down --volumes --remove-orphans
+docker-compose down --remove-orphans #--volumes
 
 echo "🚀 Levantando contenedores..."
 docker-compose up -d --build

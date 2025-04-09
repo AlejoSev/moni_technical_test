@@ -2,7 +2,16 @@ import requests
 import json
 import os
 
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
@@ -14,7 +23,17 @@ from .const import STATUS_REJECTED
 from .const import LoanRequestStatus
 
 
+@ensure_csrf_cookie
+def csrf_token_view(request):
+    return JsonResponse({'msg': 'CSRF cookie set'})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class LoanRequestView(APIView):
+	http_method_names = ['post']
+	authentication_classes = []
+	permission_classes = []
+
 	def post(self, request: Request) -> Response:
 		"""
 		Endpoint that creates the LoanRequest object.
@@ -65,3 +84,28 @@ class LoanRequestView(APIView):
 			print("Error callign external API:", e)
 
 			return STATUS_REJECTED
+
+
+class AdminLoginView(APIView):
+	authentication_classes = []
+	permission_classes = []
+
+	def post(self, request):
+		username = request.data.get('username')
+		password = request.data.get('password')
+
+		print(f'Creds: {username}:{password}')
+
+		user = authenticate(username=username, password=password)
+
+		if user and user.is_staff:
+			login(request, user)
+			return Response({'success': True, 'msg': 'Login exitoso'}, status=status.HTTP_200_OK)
+		else:
+			return Response({'success': False, 'msg': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LoanRequestViewSet(ModelViewSet):
+	queryset = LoanRequest.objects.all()
+	serializer_class = LoanRequestSerializer
+	permission_classes = [AllowAny]
