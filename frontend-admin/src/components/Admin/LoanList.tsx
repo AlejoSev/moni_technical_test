@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import api from './api.ts';
 import './LoanList.css';
 
 axios.defaults.withCredentials = true;
@@ -16,12 +15,33 @@ export const LoanList = () => {
 
   useEffect(() => {
     const fetchLoans = async () => {
+      const token = localStorage.getItem('authToken');
+
+      console.log(token);
+      
+      if (!token) {
+        alert('No tienes sesión iniciada');
+        return;
+      }
+      
       try {
-        const response = await api.get('/admin/loans');
-        const sortedLoans = response.data.sort((a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        setLoans(sortedLoans);
+        const response = await fetch('http://localhost:8000/api/admin/loans', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const sortedLoans = data.sort((a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+          setLoans(sortedLoans);
+        } else {
+          alert('Error al cargar los préstamos');
+        }
       } catch (err) {
         alert('Error al cargar los préstamos');
       }
@@ -33,10 +53,28 @@ export const LoanList = () => {
   const handleDelete = async (id: number) => {
     const confirm = window.confirm('¿Estás seguro que querés eliminar este préstamo?');
     if (!confirm) return;
-
+  
+    const token = localStorage.getItem('authToken');
+  
+    if (!token) {
+      alert('No tienes sesión iniciada');
+      return;
+    }
+  
     try {
-      await api.delete(`/admin/loans/${id}/`);
-      setLoans(loans.filter((loan) => loan.id !== id));
+      const response = await fetch(`http://localhost:8000/api/admin/loans/${id}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        setLoans(loans.filter((loan) => loan.id !== id));
+      } else {
+        alert('Error al eliminar el préstamo');
+      }
     } catch (err) {
       alert('Error al eliminar el préstamo');
     }
@@ -57,20 +95,51 @@ export const LoanList = () => {
   };
 
   const handleSave = async (id: number) => {
+    const token = localStorage.getItem('authToken');
+  
+    if (!token) {
+      alert('No tienes sesión iniciada');
+      return;
+    }
+  
     try {
-      await api.patch(`/admin/loans/${id}/`, {
-        ...editForm,
-        amount: parseFloat(editForm.amount as any),
+      const response = await fetch(`http://localhost:8000/api/admin/loans/${id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...editForm,
+          amount: parseFloat(editForm.amount as any),
+        }),
       });
+  
+      if (!response.ok) {
+        throw new Error('Error al guardar los cambios');
+      }
+  
       setEditingId(null);
-
-      const response = await api.get('/admin/loans');
-      const sortedLoans = response.data.sort((a, b) =>
+  
+      const loansResponse = await fetch('http://localhost:8000/api/admin/loans', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!loansResponse.ok) {
+        throw new Error('Error al cargar los préstamos');
+      }
+  
+      const data = await loansResponse.json();
+      const sortedLoans = data.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       setLoans(sortedLoans);
     } catch (err) {
-      alert('Error al guardar los cambios');
+      alert(err.message || 'Error al guardar los cambios');
     }
   };
 

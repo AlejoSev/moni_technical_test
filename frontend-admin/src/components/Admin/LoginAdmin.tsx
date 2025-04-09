@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import api from './api.ts';
 import './LoginAdmin.css';
-import { getCSRFToken } from './csrf';
 
 axios.defaults.withCredentials = true;
 
@@ -15,17 +13,26 @@ export const LoginAdmin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      
-      await getCSRFToken();
-
-      const response = await api.post('admin/login', {
-        username,
-        password,
+      const response = await fetch("http://localhost:8000/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
-      navigate('/admin/dashboard');
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('authToken', data.token);
+        alert('Login exitoso');
+        navigate('/admin/dashboard');
+      } else {
+        alert('Credenciales inválidas');
+      }
     } catch (err) {
       alert('Error de autenticación');
-    }
+      }
   };
 
   return (
